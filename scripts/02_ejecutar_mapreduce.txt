@@ -1,0 +1,88 @@
+==============================================================================
+RETO 2 - COMANDOS DE EJECUCION (HDFS + HADOOP STREAMING)
+Proyecto: Analisis del catalogo de Netflix - Equipo Elsner
+Entorno de referencia: Hadoop 3.3.x sobre Linux (usuario con HADOOP_HOME definido)
+==============================================================================
+
+0) UBICARSE EN LA CARPETA DE LOS PROGRAMAS
+------------------------------------------------------------------------------
+cd ~/netflix/mapreduce
+# Deben estar aqui: 02_mapper_actores.py y 02_reducer_actores.py
+
+chmod +x 02_mapper_actores.py 02_reducer_actores.py
+
+
+1) CARGAR EL ARCHIVO LIMPIO EN HDFS
+------------------------------------------------------------------------------
+hdfs dfs -mkdir -p /data/netflix/clean/
+
+hdfs dfs -put -f netflix_clean.csv /data/netflix/clean/
+
+# Evidencia: listado con nombre y tamano del archivo
+hdfs dfs -ls -h /data/netflix/clean/
+
+# Verificacion opcional del contenido (primeras 3 lineas)
+hdfs dfs -cat /data/netflix/clean/netflix_clean.csv | head -n 3
+
+
+2) PREPARAR LA CARPETA DE SALIDA
+------------------------------------------------------------------------------
+# Hadoop no sobreescribe la salida: si existe, se elimina antes de ejecutar
+hdfs dfs -rm -r -f /data/netflix/results/actores/
+
+
+3) EJECUTAR EL TRABAJO MAPREDUCE CON HADOOP STREAMING
+------------------------------------------------------------------------------
+# Ajuste la version del jar si su instalacion es distinta:
+#   ls $HADOOP_HOME/share/hadoop/tools/lib/ | grep streaming
+
+hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
+  -D mapreduce.job.name="netflix_actores" \
+  -D mapreduce.job.reduces=1 \
+  -files 02_mapper_actores.py,02_reducer_actores.py \
+  -mapper "python3 02_mapper_actores.py" \
+  -reducer "python3 02_reducer_actores.py" \
+  -input /data/netflix/clean/netflix_clean.csv \
+  -output /data/netflix/results/actores/
+
+# Evidencia: el cliente debe informar "Job ... completed successfully"
+# y "map 100%" / "reduce 100%".
+
+
+4) REVISAR Y DESCARGAR EL RESULTADO
+------------------------------------------------------------------------------
+hdfs dfs -ls -h /data/netflix/results/actores/
+
+# Tamano del resultado y numero de filas (una por actor)
+hdfs dfs -cat /data/netflix/results/actores/part-* | wc -l
+
+# Descargar TODAS las partes (evidencia del reto)
+mkdir -p ./partes
+hdfs dfs -get /data/netflix/results/actores/part-* ./partes/
+
+# Alternativa para verlo en pantalla
+hdfs dfs -cat /data/netflix/results/actores/part-* | sort -t$'\t' -k2,2nr | head -n 20
+
+
+5) REUNIR LAS PARTES EN mapreduce_actores.csv (LOCAL)
+------------------------------------------------------------------------------
+python3 02_exportar_resultado.py --partes ./partes \
+    --salida ../datos/resultados/mapreduce_actores.csv
+
+# Comprobar el archivo final
+head -n 11 ../datos/resultados/mapreduce_actores.csv
+
+
+==============================================================================
+NOTAS
+------------------------------------------------------------------------------
+* Si el cluster usa Python 2, reemplace python3 por python.
+* Si el mapper falla con "python3: command not found", agregue:
+      -D mapreduce.map.env="PATH=/usr/bin:/bin" \
+      -D mapreduce.reduce.env="PATH=/usr/bin:/bin"
+* Para validar el mismo trabajo sin Hadoop (ensayo local de la demo):
+      python3 scripts/02_simular_mapreduce_local.py
+  Este simulador ejecuta el mapper, ordena por clave y ejecuta el reducer,
+  reproduciendo el comportamiento de Hadoop Streaming. NO sustituye la
+  evidencia de HDFS exigida en el informe.
+==============================================================================

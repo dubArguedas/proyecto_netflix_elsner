@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es" data-page="catalogo" data-title="Explorador del catálogo"
+      data-subtitle="Consulta netflix_clean.csv directamente desde la API del proyecto"
+      data-crumb="Datos · Catálogo limpio">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo · Observatorio Netflix</title>
+  <link rel="icon" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main">
+      <header id="topbar" class="topbar"></header>
+
+      <main class="content">
+        <section class="panel mb-4">
+          <div class="panel-head">
+            <div>
+              <h2>Buscar en el catálogo limpio</h2>
+              <p>Filtra por título, elenco, director o país. La búsqueda se resuelve en el backend sobre 8 807 registros.</p>
+            </div>
+            <div class="acciones">
+              <a class="btn-pro" href="/api/export/netflix_clean.csv">Descargar CSV</a>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="row g-2 align-items-center">
+              <div class="col-12 col-lg-6">
+                <div class="input-group">
+                  <span class="input-group-text bg-white" style="border-color:var(--line)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8693ad" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                  </span>
+                  <input type="search" id="buscador" class="form-control" placeholder="Ej.: Anupam Kher, India, Stranger Things…"
+                         style="border-color:var(--line);font-size:13.5px">
+                </div>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="d-flex gap-2 flex-wrap" id="filtrosTipo">
+                  <button class="btn-pro active" data-tipo="">Todos</button>
+                  <button class="btn-pro" data-tipo="Movie">Películas</button>
+                  <button class="btn-pro" data-tipo="TV Show">Series</button>
+                  <button class="btn-pro" data-tipo="Otro">Otro</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Resultados</h2>
+              <p id="resumenBusqueda">Cargando…</p>
+            </div>
+            <div class="acciones">
+              <select id="tamanoPagina" class="form-select form-select-sm" style="width:auto;font-size:12.5px">
+                <option value="25">25 por página</option>
+                <option value="50">50 por página</option>
+                <option value="100">100 por página</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-body tight">
+            <div class="table-responsive">
+              <table class="table-pro">
+                <thead>
+                  <tr>
+                    <th>show_id</th>
+                    <th>Título</th>
+                    <th>Tipo</th>
+                    <th>Director</th>
+                    <th>País</th>
+                    <th class="num">Año</th>
+                    <th>Clasificación</th>
+                    <th class="num">Min.</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaCatalogo">
+                  <tr><td colspan="8" class="muted">Cargando…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel-body d-flex align-items-center justify-content-between" style="border-top:1px solid var(--line)">
+            <span class="tiny muted" id="piePagina">—</span>
+            <div class="d-flex gap-2">
+              <button class="btn-pro" id="anterior">Anterior</button>
+              <button class="btn-pro" id="siguiente">Siguiente</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>Observatorio Netflix · Proyecto académico de Tecnologías Emergentes I</span>
+        <span>Jhael Arguedas · Carlos Conde · Bryan Mamani · <span data-anio></span></span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/catalogo.js"></script>
+</body>
+</html>

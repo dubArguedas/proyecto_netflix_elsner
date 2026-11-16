@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es" data-page="resumen" data-title="Resumen ejecutivo"
+      data-subtitle="Catálogo de Netflix: 8 807 títulos procesados con Pandas, Hadoop y Spark"
+      data-crumb="Panel · Visión general">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resumen ejecutivo · Observatorio Netflix</title>
+  <link rel="icon" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main">
+      <header id="topbar" class="topbar"></header>
+
+      <main class="content">
+        <section class="hero mb-4">
+          <h2>¿Qué contiene el catálogo de Netflix?</h2>
+          <p>
+            Análisis de <span class="mono" style="color:#ffb4b8">netflix_titles.csv</span> (Kaggle) con un flujo
+            completo de Big Data: limpieza con <strong style="color:#fff">Pandas</strong>, conteo de títulos por actor con
+            <strong style="color:#fff">MapReduce sobre HDFS</strong> y validación con
+            <strong style="color:#fff">SQL y PySpark en Databricks</strong>.
+          </p>
+          <div class="chips">
+            <span class="chip red">Tecnologías Emergentes I · Unidad 3</span>
+            <span class="chip">Equipo Elsner</span>
+            <span class="chip">Datos reales del catálogo</span>
+            <span class="chip" id="chipActualizado">Actualizando…</span>
+          </div>
+        </section>
+
+        <div class="row g-3 mb-4" id="kpis">
+          <div class="col-6 col-xl-3">
+            <div class="kpi accent-red">
+              <div class="label">Títulos totales</div>
+              <div class="value" id="kpiTitulos">—</div>
+              <div class="hint" id="kpiTitulosHint">registros limpios</div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="kpi accent-teal">
+              <div class="label">Películas</div>
+              <div class="value" id="kpiPeliculas">—</div>
+              <div class="hint" id="kpiPeliculasHint">del catálogo</div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="kpi accent-blue">
+              <div class="label">Series</div>
+              <div class="value" id="kpiSeries">—</div>
+              <div class="hint" id="kpiSeriesHint">del catálogo</div>
+            </div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="kpi accent-amber">
+              <div class="label">Actores distintos</div>
+              <div class="value" id="kpiActores">—</div>
+              <div class="hint" id="kpiActoresHint">contados en MapReduce y Spark</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-xl-5">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Composición del catálogo</h2>
+                  <p>Títulos distintos por tipo · Análisis A</p>
+                </div>
+                <div class="acciones"><span class="chip outline">SQL = PySpark</span></div>
+              </div>
+              <div class="panel-body">
+                <div class="chart-wrap chart-260"><canvas id="graficoTipos"></canvas></div>
+                <div class="d-flex justify-content-between small muted mt-3" id="resumenTipos"></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-12 col-xl-7">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Actores con más títulos</h2>
+                  <p>Diez primeros · Reglas de cast del enunciado · Análisis B</p>
+                </div>
+                <div class="acciones">
+                  <a class="btn-pro" href="mapreduce.html">Ver MapReduce</a>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="chart-wrap chart-260"><canvas id="graficoActores"></canvas></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-xl-7">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Duración de películas por país</h2>
+                  <p>Diez países con más películas utilizadas en el cálculo · Análisis C</p>
+                </div>
+                <div class="acciones">
+                  <a class="btn-pro" href="hallazgos.html">Hallazgos</a>
+                </div>
+              </div>
+              <div class="panel-body tight">
+                <div class="table-responsive">
+                  <table class="table-pro">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>País</th>
+                        <th class="num">Películas</th>
+                        <th class="num">Duración promedio</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaPaises">
+                      <tr><td colspan="4" class="muted">Cargando…</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-12 col-xl-5">
+            <section class="panel mb-3">
+              <div class="panel-head">
+                <div>
+                  <h2>Calidad del dato</h2>
+                  <p>Controles ejecutados en la limpieza</p>
+                </div>
+              </div>
+              <div class="panel-body" id="panelCalidad">
+                <div class="muted tiny">Cargando…</div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Ruta del proceso</h2>
+                  <p>De Kaggle al tablero</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="flow">
+                  <div class="flow-step"><div class="n">01</div><strong>CSV original</strong><span>8 807 filas · 12 columnas</span></div>
+                  <div class="flow-step"><div class="n">02</div><strong>Pandas</strong><span>netflix_clean.csv</span></div>
+                  <div class="flow-step highlight"><div class="n">03</div><strong>HDFS</strong><span>MapReduce de actores</span></div>
+                  <div class="flow-step"><div class="n">04</div><strong>Databricks</strong><span>SQL · PySpark · gráficos</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="row g-3" id="filaExtra">
+          <div class="col-12 col-xl-8">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Títulos agregados por año de estreno</h2>
+                  <p>Distribución del catálogo según <span class="mono">release_year</span></p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="chart-wrap chart-220"><canvas id="graficoAnios"></canvas></div>
+              </div>
+            </section>
+          </div>
+          <div class="col-12 col-xl-4">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Clasificaciones más frecuentes</h2>
+                  <p>Campo <span class="mono">rating</span></p>
+                </div>
+              </div>
+              <div class="panel-body tight">
+                <div class="table-responsive">
+                  <table class="table-pro">
+                    <thead><tr><th>Clasificación</th><th class="num">Títulos</th></tr></thead>
+                    <tbody id="tablaRatings"></tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <span>Observatorio Netflix · Proyecto académico de Tecnologías Emergentes I</span>
+        <span>Jhael Arguedas · Carlos Conde · Bryan Mamani · <span data-anio></span></span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.umd.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/resumen.js"></script>
+</body>
+</html>

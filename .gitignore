@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Entornos y secretos
+.env
+
+# Jupyter / Databricks
+.ipynb_checkpoints/
+.databricks/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Salidas temporales
+datos/resultados/partes_locales/
+partes/
+*.log

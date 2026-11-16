@@ -1,0 +1,233 @@
+{
+  "generado_en": "2026-11-15T00:23:55+00:00",
+  "origen": "Referencia local con Pandas sobre netflix_clean.csv",
+  "registros_netflix_clean": 8807,
+  "tabla3": [
+    {
+      "analisis": "peliculas_y_series",
+      "filas_sql": 2,
+      "filas_pyspark": 2,
+      "filas_con_valores_diferentes": 0,
+      "filas_en_una_sola_salida": 0,
+      "coinciden_completamente": true
+    },
+    {
+      "analisis": "titulos_por_actor",
+      "filas_sql": 36439,
+      "filas_pyspark": 36439,
+      "filas_con_valores_diferentes": 0,
+      "filas_en_una_sola_salida": 0,
+      "coinciden_completamente": true
+    },
+    {
+      "analisis": "duracion_por_pais",
+      "filas_sql": 117,
+      "filas_pyspark": 117,
+      "filas_con_valores_diferentes": 0,
+      "filas_en_una_sola_salida": 0,
+      "coinciden_completamente": true
+    }
+  ],
+  "tabla4": [
+    {
+      "posicion": 1,
+      "actor": "Anupam Kher",
+      "mapreduce": 43,
+      "spark": 43,
+      "diferencia": 0
+    },
+    {
+      "posicion": 2,
+      "actor": "Shah Rukh Khan",
+      "mapreduce": 35,
+      "spark": 35,
+      "diferencia": 0
+    },
+    {
+      "posicion": 3,
+      "actor": "Julie Tejwani",
+      "mapreduce": 33,
+      "spark": 33,
+      "diferencia": 0
+    },
+    {
+      "posicion": 4,
+      "actor": "Naseeruddin Shah",
+      "mapreduce": 32,
+      "spark": 32,
+      "diferencia": 0
+    },
+    {
+      "posicion": 5,
+      "actor": "Takahiro Sakurai",
+      "mapreduce": 32,
+      "spark": 32,
+      "diferencia": 0
+    },
+    {
+      "posicion": 6,
+      "actor": "Rupa Bhimani",
+      "mapreduce": 31,
+      "spark": 31,
+      "diferencia": 0
+    },
+    {
+      "posicion": 7,
+      "actor": "Akshay Kumar",
+      "mapreduce": 30,
+      "spark": 30,
+      "diferencia": 0
+    },
+    {
+      "posicion": 8,
+      "actor": "Om Puri",
+      "mapreduce": 30,
+      "spark": 30,
+      "diferencia": 0
+    },
+    {
+      "posicion": 9,
+      "actor": "Yuki Kaji",
+      "mapreduce": 29,
+      "spark": 29,
+      "diferencia": 0
+    },
+    {
+      "posicion": 10,
+      "actor": "Amitabh Bachchan",
+      "mapreduce": 28,
+      "spark": 28,
+      "diferencia": 0
+    }
+  ],
+  "tabla5": {
+    "actores_mapreduce": 36439,
+    "actores_spark": 36439,
+    "ambas_iguales": 36439,
+    "ambas_diferentes": 0,
+    "solo_mapreduce": 0,
+    "solo_spark": 0
+  },
+  "comparacion_actores": {
+    "tabla4": [
+      {
+        "posicion": 1,
+        "actor": "Anupam Kher",
+        "mapreduce": 43,
+        "spark": 43,
+        "diferencia": 0
+      },
+      {
+        "posicion": 2,
+        "actor": "Shah Rukh Khan",
+        "mapreduce": 35,
+        "spark": 35,
+        "diferencia": 0
+      },
+      {
+        "posicion": 3,
+        "actor": "Julie Tejwani",
+        "mapreduce": 33,
+        "spark": 33,
+        "diferencia": 0
+      },
+      {
+        "posicion": 4,
+        "actor": "Naseeruddin Shah",
+        "mapreduce": 32,
+        "spark": 32,
+        "diferencia": 0
+      },
+      {
+        "posicion": 5,
+        "actor": "Takahiro Sakurai",
+        "mapreduce": 32,
+        "spark": 32,
+        "diferencia": 0
+      },
+      {
+        "posicion": 6,
+        "actor": "Rupa Bhimani",
+        "mapreduce": 31,
+        "spark": 31,
+        "diferencia": 0
+      },
+      {
+        "posicion": 7,
+        "actor": "Akshay Kumar",
+        "mapreduce": 30,
+        "spark": 30,
+        "diferencia": 0
+      },
+      {
+        "posicion": 8,
+        "actor": "Om Puri",
+        "mapreduce": 30,
+        "spark": 30,
+        "diferencia": 0
+      },
+      {
+        "posicion": 9,
+        "actor": "Yuki Kaji",
+        "mapreduce": 29,
+        "spark": 29,
+        "diferencia": 0
+      },
+      {
+        "posicion": 10,
+        "actor": "Amitabh Bachchan",
+        "mapreduce": 28,
+        "spark": 28,
+        "diferencia": 0
+      }
+    ],
+    "tabla5": {
+      "actores_mapreduce": 36439,
+      "actores_spark": 36439,
+      "ambas_iguales": 36439,
+      "ambas_diferentes": 0,
+      "solo_mapreduce": 0,
+      "solo_spark": 0
+    },
+    "coinciden_completamente": true,
+    "detalle_diferencias": []
+  },
+  "comparaciones_detalle": {
+    "peliculas_y_series": {
+      "clave": "tipo",
+      "filas_izquierda": 2,
+      "filas_derecha": 2,
+      "filas_comparadas": 2,
+      "filas_con_valores_diferentes": 0,
+      "filas_solo_izquierda": 0,
+      "filas_solo_derecha": 0,
+      "filas_en_ambas_iguales": 2,
+      "coinciden_completamente": true,
+      "detalle_diferencias": []
+    },
+    "titulos_por_actor": {
+      "clave": "actor",
+      "filas_izquierda": 36439,
+      "filas_derecha": 36439,
+      "filas_comparadas": 36439,
+      "filas_con_valores_diferentes": 0,
+      "filas_solo_izquierda": 0,
+      "filas_solo_derecha": 0,
+      "filas_en_ambas_iguales": 36439,
+      "coinciden_completamente": true,
+      "detalle_diferencias": []
+    },
+    "duracion_por_pais": {
+      "clave": "pais",
+      "filas_izquierda": 117,
+      "filas_derecha": 117,
+      "filas_comparadas": 117,
+      "filas_con_valores_diferentes": 0,
+      "filas_solo_izquierda": 0,
+      "filas_solo_derecha": 0,
+      "filas_en_ambas_iguales": 117,
+      "coinciden_completamente": true,
+      "detalle_diferencias": []
+    }
+  }
+}

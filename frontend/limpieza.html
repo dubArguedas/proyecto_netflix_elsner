@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es" data-page="limpieza" data-title="Reto 1 · Limpieza con Pandas"
+      data-subtitle="Transformación de netflix_titles.csv en una fuente común: netflix_clean.csv"
+      data-crumb="Etapas · Reto 1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Limpieza · Observatorio Netflix</title>
+  <link rel="icon" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main">
+      <header id="topbar" class="topbar"></header>
+
+      <main class="content">
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-lg-4">
+            <div class="kpi">
+              <div class="label">Entrada</div>
+              <div class="value" style="font-size:19px" id="archivoOriginal">netflix_titles.csv</div>
+              <div class="hint" id="detalleOriginal">Leyendo metadatos…</div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <div class="kpi accent-red">
+              <div class="label">Programa</div>
+              <div class="value mono" style="font-size:19px">01_limpiar_netflix.py</div>
+              <div class="hint">Python + Pandas · 11 pasos en orden</div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <div class="kpi accent-teal">
+              <div class="label">Salida</div>
+              <div class="value" style="font-size:19px">netflix_clean.csv</div>
+              <div class="hint" id="detalleLimpio">UTF-8 · con cabecera · sin índice</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-xl-7">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Tabla 1 · Resultado de la limpieza</h2>
+                  <p>Indicadores contados en el orden de ejecución, sin duplicar registros eliminados</p>
+                </div>
+                <div class="acciones">
+                  <a class="btn-pro" href="/api/export/netflix_clean.csv">Descargar CSV limpio</a>
+                </div>
+              </div>
+              <div class="panel-body tight">
+                <table class="table-pro">
+                  <thead>
+                    <tr><th>Indicador</th><th class="num">Cantidad</th></tr>
+                  </thead>
+                  <tbody id="tablaLimpieza">
+                    <tr><td colspan="2" class="muted">Cargando…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-12 col-xl-5">
+            <section class="panel mb-3">
+              <div class="panel-head">
+                <div>
+                  <h2>Del archivo original al limpio</h2>
+                  <p>Registros conservados y descartados</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="embudoLimpieza"></div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Cobertura temporal</h2>
+                  <p>Fechas de incorporación al catálogo</p>
+                </div>
+              </div>
+              <div class="panel-body" id="panelFechas">
+                <div class="muted tiny">Cargando…</div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <section class="panel mb-4">
+          <div class="panel-head">
+            <div>
+              <h2>Valores nulos por columna</h2>
+              <p>Los datos desconocidos se mantienen nulos: no se imputan actores, países ni duraciones</p>
+            </div>
+            <div class="acciones"><span class="chip outline" id="chipColumnas">13 columnas</span></div>
+          </div>
+          <div class="panel-body">
+            <div class="chart-wrap chart-300"><canvas id="graficoNulos"></canvas></div>
+          </div>
+        </section>
+
+        <section class="panel mb-4">
+          <div class="panel-head">
+            <div>
+              <h2>Muestra del archivo limpio</h2>
+              <p>Primeros diez registros de <span class="mono">netflix_clean.csv</span>, incluida <span class="mono">duration_min</span></p>
+            </div>
+          </div>
+          <div class="panel-body tight">
+            <div class="table-responsive">
+              <table class="table-pro">
+                <thead>
+                  <tr>
+                    <th>show_id</th><th>type</th><th>title</th><th>country</th>
+                    <th>date_added</th><th class="num">duration_min</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaMuestra">
+                  <tr><td colspan="6" class="muted">Cargando…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Programa de limpieza</h2>
+              <p>Las once operaciones del enunciado, en el mismo orden</p>
+            </div>
+            <div class="acciones"><span class="chip">scripts/01_limpiar_netflix.py</span></div>
+          </div>
+          <div class="panel-body">
+            <div class="code"><span class="c"># 1. espacios al inicio y al final de los campos de texto</span>
+df[columna] = df[columna].str.strip()
+
+<span class="c"># 2. saltos de línea y tabulaciones por espacios</span>
+df[columna] = df[columna].str.replace(<span class="s">r"[\r\n\t]+"</span>, <span class="s">" "</span>, regex=<span class="k">True</span>)
+
+<span class="c"># 3. textos vacíos a nulos</span>
+df[columna] = df[columna].mask(df[columna] == <span class="s">""</span>, pd.NA)
+
+<span class="c"># 4-6. duplicados, show_id ausente y show_id repetido</span>
+df = df.drop_duplicates().dropna(subset=[<span class="s">"show_id"</span>]).drop_duplicates(<span class="s">"show_id"</span>)
+
+<span class="c"># 7. date_added a dd/mm/aaaa (vacío si no se puede interpretar)</span>
+df[<span class="s">"date_added"</span>] = normalizar_fechas(df[<span class="s">"date_added"</span>])
+
+<span class="c"># 8. duration_min solo para películas</span>
+df[<span class="s">"duration_min"</span>] = extraer_minutos(df).where(df[<span class="s">"type"</span>] == <span class="s">"Movie"</span>)
+
+<span class="c"># 11. CSV UTF-8, con cabecera, sin índice</span>
+df.to_csv(<span class="s">"netflix_clean.csv"</span>, index=<span class="k">False</span>, encoding=<span class="s">"utf-8"</span>)</div>
+            <p class="tiny muted mt-3 mb-0">
+              El código completo, con validación de fechas independiente del idioma del sistema y el reporte de la tabla 1,
+              está en <span class="mono">scripts/01_limpiar_netflix.py</span>.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>Observatorio Netflix · Proyecto académico de Tecnologías Emergentes I</span>
+        <span>Jhael Arguedas · Carlos Conde · Bryan Mamani · <span data-anio></span></span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.umd.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/limpieza.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Dependencias solo para generar el informe, la presentacion y las figuras.
+# Instalar con:  python -m pip install -r requirements-docs.txt
+reportlab>=4.0
+matplotlib>=3.8
+pillow>=10.0

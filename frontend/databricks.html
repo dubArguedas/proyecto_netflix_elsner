@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es" data-page="databricks" data-title="Reto 3 · Databricks"
+      data-subtitle="Tres análisis resueltos con SQL y PySpark, y verificación contra MapReduce"
+      data-crumb="Etapas · Reto 3">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Databricks · Observatorio Netflix</title>
+  <link rel="icon" href="assets/img/favicon.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main">
+      <header id="topbar" class="topbar"></header>
+
+      <main class="content">
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-lg-4">
+            <div class="kpi accent-red">
+              <div class="label">Catálogo · esquema</div>
+              <div class="value mono" style="font-size:17px">workspace.netflix</div>
+              <div class="hint">Unity Catalog · ajustable con widgets</div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <div class="kpi accent-teal">
+              <div class="label">Tabla base</div>
+              <div class="value mono" style="font-size:17px">netflix_clean</div>
+              <div class="hint" id="filasNetflixClean">8 807 registros · 13 columnas</div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <div class="kpi accent-blue">
+              <div class="label">Tabla de Hadoop</div>
+              <div class="value mono" style="font-size:17px">mapreduce_actores</div>
+              <div class="hint" id="filasMapReduce">36 439 actores</div>
+            </div>
+          </div>
+        </div>
+
+        <section class="panel mb-4">
+          <div class="panel-head">
+            <div>
+              <h2>Tabla 3 · Verificación de SQL y PySpark</h2>
+              <p>Cada análisis se resuelve dos veces y se comparan las salidas completas por su clave</p>
+            </div>
+            <div class="acciones">
+              <a class="btn-pro" href="/api/descargas/notebook" download>Descargar notebook</a>
+            </div>
+          </div>
+          <div class="panel-body tight">
+            <table class="table-pro">
+              <thead>
+                <tr>
+                  <th>Análisis</th>
+                  <th class="num">Filas SQL</th>
+                  <th class="num">Filas PySpark</th>
+                  <th class="num">Filas con valores diferentes</th>
+                  <th class="num">Filas en una sola salida</th>
+                  <th>¿Coinciden?</th>
+                </tr>
+              </thead>
+              <tbody id="tabla3">
+                <tr><td colspan="6" class="muted">Cargando…</td></tr>
+              </tbody>
+            </table>
+            <p class="tiny muted mt-3 mb-0" id="origenVerificacion"></p>
+          </div>
+        </section>
+
+        <section class="panel mb-4">
+          <div class="panel-head">
+            <div>
+              <h2>Soluciones ejecutadas</h2>
+              <p>La misma consulta en una celda SQL y en una celda Python, listas para pegar en Databricks</p>
+            </div>
+            <div class="acciones"><span class="chip outline">03_analisis_netflix</span></div>
+          </div>
+          <div class="panel-body">
+            <ul class="nav nav-pills gap-2 mb-3" id="tabsAnalisis" role="tablist">
+              <li class="nav-item"><button class="btn-pro active" data-bs-toggle="pill" data-bs-target="#paneA" type="button">A · Películas y series</button></li>
+              <li class="nav-item"><button class="btn-pro" data-bs-toggle="pill" data-bs-target="#paneB" type="button">B · Títulos por actor</button></li>
+              <li class="nav-item"><button class="btn-pro" data-bs-toggle="pill" data-bs-target="#paneC" type="button">C · Duración por país</button></li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="paneA">
+                <div class="row g-3">
+                  <div class="col-12 col-xl-6">
+                    <div class="section-title">SQL</div>
+                    <div class="code"><span class="k">SELECT</span> tipo,
+       <span class="n">COUNT</span>(<span class="k">DISTINCT</span> show_id) <span class="k">AS</span> cantidad_titulos
+<span class="k">FROM</span> (
+  <span class="k">SELECT</span> show_id,
+         <span class="k">CASE</span>
+           <span class="k">WHEN</span> <span class="s">`type`</span> <span class="k">IS NULL</span> <span class="k">THEN</span> <span class="s">'Sin clasificación'</span>
+           <span class="k">WHEN</span> <span class="s">`type`</span> <span class="k">IN</span> (<span class="s">'Movie'</span>, <span class="s">'TV Show'</span>) <span class="k">THEN</span> <span class="s">`type`</span>
+           <span class="k">ELSE</span> <span class="s">'Otro'</span>
+         <span class="k">END</span> <span class="k">AS</span> tipo
+  <span class="k">FROM</span> netflix_clean
+)
+<span class="k">GROUP BY</span> tipo
+<span class="k">ORDER BY</span> tipo;</div>
+                  </div>
+                  <div class="col-12 col-xl-6">
+                    <div class="section-title">PySpark</div>
+                    <div class="code"><span class="k">from</span> pyspark.sql <span class="k">import</span> functions <span class="k">as</span> F
+
+tipos = df.<span class="n">withColumn</span>(
+    <span class="s">"tipo"</span>,
+    F.<span class="n">when</span>(F.<span class="n">col</span>(<span class="s">"type"</span>).<span class="n">isNull</span>(), <span class="s">"Sin clasificación"</span>)
+     .<span class="n">when</span>(F.<span class="n">col</span>(<span class="s">"type"</span>).<span class="n">isin</span>([<span class="s">"Movie"</span>, <span class="s">"TV Show"</span>]), F.<span class="n">col</span>(<span class="s">"type"</span>))
+     .<span class="n">otherwise</span>(<span class="s">"Otro"</span>)
+).<span class="n">groupBy</span>(<span class="s">"tipo"</span>).<span class="n">agg</span>(
+    F.<span class="n">countDistinct</span>(<span class="s">"show_id"</span>).<span class="n">alias</span>(<span class="s">"cantidad_titulos"</span>)
+).<span class="n">orderBy</span>(<span class="s">"tipo"</span>)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="paneB">
+                <div class="row g-3">
+                  <div class="col-12 col-xl-6">
+                    <div class="section-title">SQL</div>
+                    <div class="code"><span class="k">WITH</span> actores <span class="k">AS</span> (
+  <span class="k">SELECT DISTINCT</span> show_id, <span class="n">trim</span>(actor) <span class="k">AS</span> actor
+  <span class="k">FROM</span> netflix_clean
+  <span class="k">LATERAL VIEW</span> <span class="n">explode</span>(<span class="n">split</span>(<span class="s">`cast`</span>, <span class="s">','</span>)) t <span class="k">AS</span> actor
+  <span class="k">WHERE</span> <span class="s">`cast`</span> <span class="k">IS NOT NULL</span>
+)
+<span class="k">SELECT</span> actor,
+       <span class="n">COUNT</span>(<span class="k">DISTINCT</span> show_id) <span class="k">AS</span> cantidad_titulos
+<span class="k">FROM</span> actores
+<span class="k">WHERE</span> actor &lt;&gt; <span class="s">''</span>
+<span class="k">GROUP BY</span> actor
+<span class="k">ORDER BY</span> cantidad_titulos <span class="k">DESC</span>, actor <span class="k">ASC</span>;</div>
+                  </div>
+                  <div class="col-12 col-xl-6">
+                    <div class="section-title">PySpark</div>
+                    <div class="code">actores = (df
+  .<span class="n">select</span>(<span class="s">"show_id"</span>, F.<span class="n">explode</span>(
+      F.<span class="n">split</span>(F.<span class="n">col</span>(<span class="s">"cast"</span>), <span class="s">r",\s*"</span>)).<span class="n">alias</span>(<span class="s">"actor"</span>))
+  .<span class="n">withColumn</span>(<span class="s">"actor"</span>, F.<span class="n">trim</span>(<span class="s">"actor"</span>))
+  .<span class="n">where</span>(F.<span class="n">col</span>(<span class="s">"actor"</span>) != <span class="s">""</span>)
+  .<span class="n">dropDuplicates</span>([<span class="s">"show_id"</span>, <span class="s">"actor"</span>]))
+
+actores_pyspark = (actores
+  .<span class="n">groupBy</span>(<span class="s">"actor"</span>)
+  .<span class="n">agg</span>(F.<span class="n">countDistinct</span>(<span class="s">"show_id"</span>).<span class="n">alias</span>(<span class="s">"cantidad_titulos"</span>))
+  .<span class="n">orderBy</span>(F.<span class="n">desc</span>(<span class="s">"cantidad_titulos"</span>), F.<span class="n">asc</span>(<span class="s">"actor"</span>)))</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="paneC">
+                <div class="row g-3">
+                  <div class="col-12 col-xl-6">
+                    <div class="section-title">SQL</div>
+                    <div class="code"><span class="k">WITH</span> peliculas <span class="k">AS</span> (
+  <span class="k">SELECT DISTINCT</span> show_id, duration_min,
+         <span class="n">trim</span>(pais) <span class="k">AS</span> pais
+  <span class="k">FROM</span> netflix_clean
+  <span class="k">LATERAL VIEW</span> <span class="n">explode</span>(<span class="n">split</span>(country, <span class="s">','</span>)) p <span class="k">AS</span> pais
+  <span class="k">WHERE</span> <span class="s">`type`</span> = <span class="s">'Movie'</span>
+    <span class="k">AND</span> duration_min <span class="k">IS NOT NULL</span>
+    <span class="k">AND</span> duration_min &gt; <span class="n">0</span>
+    <span class="k">AND</span> country <span class="k">IS NOT NULL</span>
+)
+<span class="k">SELECT</span> pais,
+       <span class="n">COUNT</span>(<span class="k">DISTINCT</span> show_id) <span class="k">AS</span> cantidad_peliculas,
+       <span class="n">ROUND</span>(<span class="n">AVG</span>(duration_min), <span class="n">2</span>) <span class="k">AS</span> duracion_promedio_min
+<span class="k">FROM</span> peliculas
+<span class="k">WHERE</span> pais &lt;&gt; <span class="s">''</span>
+<span class="k">GROUP BY</span> pais
+<span class="k">ORDER BY</span> cantidad_peliculas <span class="k">DESC</span>, pais <span class="k">ASC</span>;</div>
+                  </div>
+                  <div class="col-12 col-xl-6">
+                    <div class="section-title">PySpark</div>
+                    <div class="code">paises = (df
+  .<span class="n">where</span>((F.<span class="n">col</span>(<span class="s">"type"</span>) == <span class="s">"Movie"</span>)
+         &amp; (F.<span class="n">col</span>(<span class="s">"duration_min"</span>) &gt; <span class="n">0</span>)
+         &amp; F.<span class="n">col</span>(<span class="s">"country"</span>).<span class="n">isNotNull</span>())
+  .<span class="n">select</span>(<span class="s">"show_id"</span>, <span class="s">"duration_min"</span>,
+          F.<span class="n">explode</span>(F.<span class="n">split</span>(F.<span class="n">col</span>(<span class="s">"country"</span>), <span class="s">",\s*"</span>)).<span class="n">alias</span>(<span class="s">"pais"</span>))
+  .<span class="n">withColumn</span>(<span class="s">"pais"</span>, F.<span class="n">trim</span>(<span class="s">"pais"</span>))
+  .<span class="n">where</span>(F.<span class="n">col</span>(<span class="s">"pais"</span>) != <span class="s">""</span>)
+  .<span class="n">dropDuplicates</span>([<span class="s">"show_id"</span>, <span class="s">"pais"</span>]))
+
+duracion_pais = (paises
+  .<span class="n">groupBy</span>(<span class="s">"pais"</span>)
+  .<span class="n">agg</span>(F.<span class="n">countDistinct</span>(<span class="s">"show_id"</span>).<span class="n">alias</span>(<span class="s">"cantidad_peliculas"</span>),
+       F.<span class="n">round</span>(F.<span class="n">avg</span>(<span class="s">"duration_min"</span>), <span class="n">2</span>).<span class="n">alias</span>(<span class="s">"duracion_promedio_min"</span>))
+  .<span class="n">orderBy</span>(F.<span class="n">desc</span>(<span class="s">"cantidad_peliculas"</span>), F.<span class="n">asc</span>(<span class="s">"pais"</span>)))</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="notice mt-3">
+              <strong>Comparación de las salidas completas:</strong> se unen ambas tablas por su clave
+              (<span class="mono">tipo</span>, <span class="mono">actor</span> o <span class="mono">pais</span>) con un
+              <span class="mono">full outer join</span> y se cuentan las filas iguales, diferentes y presentes en una
+              sola salida. En los promedios se comparan los valores redondeados a dos decimales.
+            </div>
+          </div>
+        </section>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-xl-7">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Tabla 4 · Comparación de los diez primeros actores</h2>
+                  <p>Diez primeros del resultado de Spark, ordenados por cantidad y nombre</p>
+                </div>
+              </div>
+              <div class="panel-body tight">
+                <table class="table-pro">
+                  <thead>
+                    <tr>
+                      <th>#</th><th>Actor</th>
+                      <th class="num">MapReduce</th><th class="num">Spark</th><th class="num">Diferencia</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla4">
+                    <tr><td colspan="5" class="muted">Cargando…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-12 col-xl-5">
+            <section class="panel h-100">
+              <div class="panel-head">
+                <div>
+                  <h2>Tabla 5 · Verificación completa</h2>
+                  <p>MapReduce contra Spark en todo el catálogo</p>
+                </div>
+                <div class="acciones"><span class="chip ok" id="chipVerificacion">—</span></div>
+              </div>
+              <div class="panel-body" id="tabla5">
+                <div class="muted tiny">Cargando…</div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Pasos ejecutados en Databricks</h2>
+              <p>La guía completa está en <span class="mono">databricks/GUIA_DATABRICKS.md</span></p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="flow-step" style="height:100%">
+                  <div class="n">Paso 1</div><strong>Cargar los CSV</strong>
+                  <span>Volumen de Unity Catalog con <span class="mono">netflix_clean.csv</span> y <span class="mono">mapreduce_actores.csv</span>.</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="flow-step" style="height:100%">
+                  <div class="n">Paso 2</div><strong>Crear las tablas</strong>
+                  <span><span class="mono">netflix_clean</span> y <span class="mono">mapreduce_actores</span> en el esquema.</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="flow-step" style="height:100%;">
+                  <div class="n">Paso 3</div><strong>Resolver A, B y C</strong>
+                  <span>Una celda SQL y una celda PySpark por análisis, más la comparación.</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="flow-step" style="height:100%">
+                  <div class="n">Paso 4</div><strong>Verificar y graficar</strong>
+                  <span>Tablas 3, 4 y 5, dos gráficos y la tabla de duración por país.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <div class="section-title">Crear las tablas desde el volumen</div>
+                <div class="code"><span class="k">CREATE OR REPLACE TABLE</span> netflix_clean <span class="k">AS</span>
+<span class="k">SELECT</span> * <span class="k">FROM</span> <span class="n">read_files</span>(
+  <span class="s">'/Volumes/workspace/netflix/datos/netflix_clean.csv'</span>,
+  format =&gt; <span class="s">'csv'</span>, header =&gt; <span class="k">true</span>, inferSchema =&gt; <span class="k">true</span>
+);
+
+<span class="k">CREATE OR REPLACE TABLE</span> mapreduce_actores <span class="k">AS</span>
+<span class="k">SELECT</span> * <span class="k">FROM</span> <span class="n">read_files</span>(
+  <span class="s">'/Volumes/workspace/netflix/datos/mapreduce_actores.csv'</span>,
+  format =&gt; <span class="s">'csv'</span>, header =&gt; <span class="k">true</span>, inferSchema =&gt; <span class="k">true</span>
+);</div>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="section-title">Comprobar la carga</div>
+                <div class="code"><span class="k">SELECT COUNT</span>(*) <span class="k">AS</span> registros,
+       <span class="n">COUNT</span>(<span class="k">DISTINCT</span> show_id) <span class="k">AS</span> titulos
+<span class="k">FROM</span> netflix_clean;   <span class="c">-- 8807 y 8807</span>
+
+<span class="k">SELECT COUNT</span>(*) <span class="k">AS</span> actores <span class="k">FROM</span> mapreduce_actores;
+                        <span class="c">-- 36439</span>
+
+<span class="k">SELECT</span> * <span class="k">FROM</span> netflix_clean <span class="k">LIMIT</span> <span class="n">5</span>;
+<span class="k">SELECT</span> * <span class="k">FROM</span> mapreduce_actores <span class="k">LIMIT</span> <span class="n">5</span>;</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>Observatorio Netflix · Proyecto académico de Tecnologías Emergentes I</span>
+        <span>Jhael Arguedas · Carlos Conde · Bryan Mamani · <span data-anio></span></span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.umd.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/databricks.js"></script>
+</body>
+</html>
